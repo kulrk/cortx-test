@@ -285,7 +285,7 @@ k8s_cortx_deploy:
         mem: '128Mi'
         cpu: '250m'
       limits:
-        mem: '512i'
+        mem: '512Mi'
         cpu: '350m'
 test_basic_io:
   io_upper_limits:
