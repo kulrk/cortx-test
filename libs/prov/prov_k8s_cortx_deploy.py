@@ -31,8 +31,10 @@ import shutil
 import signal
 import string
 import time
+from string import Template, ascii_letters, digits
+from threading import Thread
 from typing import List
-from string import Template
+
 import requests.exceptions
 import yaml
 
@@ -40,22 +42,22 @@ from commons import commands as common_cmd
 from commons import constants as common_const
 from commons import pswdmanager
 from commons.helpers.pods_helper import LogicalNode
-from commons.params import LOG_DIR
 from commons.params import LATEST_LOG_FOLDER
+from commons.params import LOG_DIR
 from commons.params import TEST_DATA_FOLDER
-from commons.utils import system_utils
 from commons.utils import assert_utils
 from commons.utils import ext_lbconfig_utils
-from config import PROV_CFG
-from config import S3_CFG
-from config import PROV_TEST_CFG
+from commons.utils import system_utils
 from config import CMN_CFG
+from config import PROV_CFG
+from config import PROV_TEST_CFG
+from config import S3_CFG
 from libs.csm.rest.csm_rest_s3user import RestS3user
+from libs.ha.ha_common_libs_k8s import HAK8s
 from libs.csm.rest.csm_rest_capacity import SystemCapacity
 from libs.prov.provisioner import Provisioner
 from libs.s3 import S3H_OBJ
 from libs.s3.s3_test_lib import S3TestLib
-from libs.ha.ha_common_libs_k8s import HAK8s
 from scripts.s3_bench import s3bench
 
 LOGGER = logging.getLogger(__name__)
@@ -112,8 +114,8 @@ class ProvDeployK8sCortxLib:
         if len(master_node_list) > 0:
             # TODO : handle multiple master node case.
             input_str = f'hostname={master_node_list[0].hostname},' \
-                f'user={master_node_list[0].username},' \
-                f'pass={master_node_list[0].password}'
+                        f'user={master_node_list[0].username},' \
+                        f'pass={master_node_list[0].password}'
             hosts_input_str.append(input_str)
         else:
             return False, "Master Node List is empty"
@@ -121,8 +123,8 @@ class ProvDeployK8sCortxLib:
         if len(worker_node_list) > 0:
             for each in worker_node_list:
                 input_str = f'hostname={each.hostname},' \
-                    f'user={each.username},' \
-                    f'pass={each.password}'
+                            f'user={each.username},' \
+                            f'pass={each.password}'
                 hosts_input_str.append(input_str)
         else:
             return False, "Worker Node List is empty"
@@ -192,7 +194,7 @@ class ProvDeployK8sCortxLib:
         LOGGER.info("No. of disks : %s", count[0])
         if int(count[0]) < self.deploy_cfg["prereq"]["min_disks"]:
             return False, f"Need at least " \
-                f"{self.deploy_cfg['prereq']['min_disks']} disks for deployment"
+                          f"{self.deploy_cfg['prereq']['min_disks']} disks for deployment"
 
         LOGGER.info("Checking OS release version")
         resp = node_obj.execute_cmd(cmd=
@@ -511,11 +513,11 @@ class ProvDeployK8sCortxLib:
             count = cvg_count
             if data_disk_per_cvg == 0:
                 if log_disk_flag:
-                    # Here the increment for 2 is due to 1 disk each reserved
-                    # metadata,log disk respectively
-                    data_disk_per_cvg = int(len(device_list[cvg_count + 2:]) / cvg_count)
+                    # Here the increment for 1 is due to 1 disk each reserved
+                    # log disk respectively
+                    data_disk_per_cvg = int(len(device_list[cvg_count + 1:]) / cvg_count)
                 else:
-                    data_disk_per_cvg = int(len(device_list[cvg_count+1:]) / cvg_count)
+                    data_disk_per_cvg = int(len(device_list[cvg_count:]) / cvg_count)
 
             LOGGER.debug("Data disk per cvg : %s", data_disk_per_cvg)
             # The condition to validate the config.
@@ -528,9 +530,9 @@ class ProvDeployK8sCortxLib:
                 assert False, "The requested data disk is more than" \
                               " the data disk available on the system"
             if log_disk_flag:
-                # the '2' is being multiplied to accumulate the final data disk count
-                # after excluding the metadata,log disks
-                data_devices_f = device_list[cvg_count*2:]
+                # the '1' is being added to accumulate the final data disk count
+                # after excluding the log disks
+                data_devices_f = device_list[cvg_count+1:]
                 LOGGER.debug("The data disk final is %s", data_devices_f)
             else:
                 data_devices_f = device_list[cvg_count:]
@@ -861,8 +863,8 @@ class ProvDeployK8sCortxLib:
         jen_parameter = {}
         if len(master_node_list) > 0:
             input_str = f'hostname={master_node_list[0].hostname},' \
-                f'user={master_node_list[0].username},' \
-                f'pass={master_node_list[0].password}'
+                        f'user={master_node_list[0].username},' \
+                        f'pass={master_node_list[0].password}'
             hosts_input_str.append(input_str)
         else:
             return False, "Master Node List is empty"
@@ -870,8 +872,8 @@ class ProvDeployK8sCortxLib:
         if len(worker_node_list) > 0:
             for each in worker_node_list:
                 input_str = f'hostname={each.hostname},' \
-                    f'user={each.username},' \
-                    f'pass={each.password}'
+                            f'user={each.username},' \
+                            f'pass={each.password}'
                 hosts_input_str.append(input_str)
         hosts = "\n".join(each for each in hosts_input_str)
         jen_parameter["hosts"] = hosts
@@ -1187,7 +1189,7 @@ class ProvDeployK8sCortxLib:
             LOGGER.info("json_resp %s\n Log Path %s", resp[0], resp[1])
             assert not s3bench.check_log_file_error(resp[1]), \
                 f"S3bench workload for object size {workload} failed. " \
-                    f"Please read log file {resp[1]}"
+                f"Please read log file {resp[1]}"
             LOGGER.info("ENDED: S3 bench workload test")
 
     @staticmethod
@@ -2072,7 +2074,7 @@ class ProvDeployK8sCortxLib:
     @staticmethod
     def get_default_access_secret_key(filepath):
         """
-        This is used to access access key and secret key
+        This is used to access key and secret key
         file: solution.yaml file
         returns access key and secrets key
         """
