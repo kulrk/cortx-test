@@ -250,7 +250,7 @@ k8s_cortx_deploy:
         mem: '256Mi'
         cpu: '250m'
       limits:
-        mem: '1Gi'
+        mem: '512Mi'
         cpu: '400m'
     rgw:
         requests:
