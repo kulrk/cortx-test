@@ -216,35 +216,38 @@ class TestIOWorkloadDegradedPath:
         client = len(self.worker_node_list) * self.clients
         percentage = self.test_cfg['nearfull_storage_percentage']
 
-        self.log.info("Step 1: Calculating byte count for required percentage")
-        resp = self.near_full_storage_obj.get_user_data_space_in_bytes(
-            master_obj=self.master_node_list[0],
-            memory_percent=percentage)
-        assert_utils.assert_true(resp[0], resp[1])
-        self.log.info("Need to add %s bytes for required percentage", resp[1])
+        # self.log.info("Step 1: Calculating byte count for required percentage")
+        # resp = self.near_full_storage_obj.get_user_data_space_in_bytes(
+        #     master_obj=self.master_node_list[0],
+        #     memory_percent=percentage)
+        # assert_utils.assert_true(resp[0], resp[1])
+        # self.log.info("Need to add %s bytes for required percentage", resp[1])
 
         self.log.info("Step 2: Performing writes till we reach required percentage")
-        ret = self.near_full_storage_obj.perform_near_full_sys_writes(s3userinfo=self.s3userinfo,
-                                                                      user_data_writes=resp[1],
-                                                                      bucket_prefix=bucket_prefix,
-                                                                      client=client)
-        assert_utils.assert_true(ret[0], ret[1])
-        for each in ret[1]:
-            each["num_clients"] = (len(self.worker_node_list) - 1) \
-                                  * self.clients
+
+        # ret = self.near_full_storage_obj.perform_near_full_sys_writes(s3userinfo=self.s3userinfo,
+        #                                                               user_data_writes=resp[1],
+        #                                                               bucket_prefix=bucket_prefix,
+        #                                                               client=client)
+        # assert_utils.assert_true(ret[0], ret[1])
+        # for each in ret[1]:
+        #     each["num_clients"] = (len(self.worker_node_list) - 1) \
+        #                           * self.clients
+
+        ret = (True, [{'bucket': 'testbkt-40173-134217728b-1659601946', 'obj_name_pref': 'obj_134217728', 'num_clients': 8, 'obj_size': 134217728, 'num_sample': 1824}, {'bucket': 'testbkt-40173-268435456b-1659605242', 'obj_name_pref': 'obj_268435456', 'num_clients': 8, 'obj_size': 268435456, 'num_sample': 912}, {'bucket': 'testbkt-40173-536870912b-1659608313', 'obj_name_pref': 'obj_536870912', 'num_clients': 8, 'obj_size': 536870912, 'num_sample': 456}, {'bucket': 'testbkt-40173-1073741824b-1659611468', 'obj_name_pref': 'obj_1073741824', 'num_clients': 8, 'obj_size': 1073741824, 'num_sample': 228}, {'bucket': 'testbkt-40173-2147483648b-1659614221', 'obj_name_pref': 'obj_2147483648', 'num_clients': 8, 'obj_size': 2147483648, 'num_sample': 114}])
         self.log.debug("Write operation data: %s", ret)
 
-        self.log.info("Step 3: Shutdown the data pod safely by making replicas=0, "
-                      "check degraded status.")
-        num_replica = self.num_replica - 1
-        resp = self.ha_obj.delete_kpod_with_shutdown_methods(self.master_node_list[0],
-                                                             self.health_obj_list[0],
-                                                             pod_prefix=[POD_NAME_PREFIX],
-                                                             delete_pod=[self.delete_pod],
-                                                             num_replica=num_replica
-                                                             )
-        assert_utils.assert_true(resp[0], "Failed in shutdown or expected cluster check")
-        self.log.info("Deleted pod : %s", list(resp[1].keys())[0])
+        # self.log.info("Step 3: Shutdown the data pod safely by making replicas=0, "
+        #               "check degraded status.")
+        # num_replica = self.num_replica - 1
+        # resp = self.ha_obj.delete_kpod_with_shutdown_methods(self.master_node_list[0],
+        #                                                      self.health_obj_list[0],
+        #                                                      pod_prefix=[POD_NAME_PREFIX],
+        #                                                      delete_pod=[self.delete_pod],
+        #                                                      num_replica=num_replica
+        #                                                      )
+        # assert_utils.assert_true(resp[0], "Failed in shutdown or expected cluster check")
+        # self.log.info("Deleted pod : %s", list(resp[1].keys())[0])
 
         self.log.info("Step 4: Performing read operations.")
         end_time = datetime.now() + timedelta(days=self.duration_in_days)
