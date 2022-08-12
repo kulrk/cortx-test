@@ -223,7 +223,7 @@ class TestIOWorkloadDegradedPath:
         # assert_utils.assert_true(resp[0], resp[1])
         # self.log.info("Need to add %s bytes for required percentage", resp[1])
 
-        self.log.info("Step 2: Performing writes till we reach required percentage")
+        # self.log.info("Step 2: Performing writes till we reach required percentage")
 
         # ret = self.near_full_storage_obj.perform_near_full_sys_writes(s3userinfo=self.s3userinfo,
         #                                                               user_data_writes=resp[1],
