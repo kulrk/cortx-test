@@ -88,6 +88,7 @@ def create_db_entry(hosts, cfg, admin_user, admin_pswd, nodes_cnt, **kwargs) -> 
         host_list.append(
             {"host": host_1, "hostname": hostname, "username": username, "password": password,
              "node_type": node_type})
+        print("host_list:: ", host_list)
         if count == int(nodes_cnt) + 1:
             break
     if len(host_list) != int(nodes_cnt) + 1:
