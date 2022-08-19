@@ -71,7 +71,8 @@ def create_db_entry(hosts, cfg, admin_user, admin_pswd, nodes_cnt, **kwargs) -> 
         json_data = json.load(file)
 
     host_list = []
-    print(host_list)
+    print("hosts:: ", hosts)
+    print("nodes_cnt:: ", nodes_cnt)
     for count, each in enumerate(hosts.split("\n"), start=1):
         print("each:: ", each)
         host = each.split(",")
