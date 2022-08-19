@@ -71,8 +71,12 @@ def create_db_entry(hosts, cfg, admin_user, admin_pswd, nodes_cnt, **kwargs) -> 
         json_data = json.load(file)
 
     host_list = []
+    print(host_list)
     for count, each in enumerate(hosts.split("\n"), start=1):
+        print("each:: ", each)
         host = each.split(",")
+        print("count:: ", count)
+        print("host:: ", host)
         node_type = "worker"
         if count == 1:
             node_type = "master"
