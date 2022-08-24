@@ -204,11 +204,11 @@ k8s_cortx_deploy:
   thirdparty_resource:
     server:   #consul_server
       requests:
-        mem: '256Mi'
-        cpu: '200m'
-      limits:
-        mem: '512Mi'
+        mem: '1024Mi'
         cpu: '300m'
+      limits:
+        mem: '2048Mi'
+        cpu: '500m'
     client:  #consul_client
       requests:
         mem: '256Mi'
@@ -258,7 +258,7 @@ k8s_cortx_deploy:
           cpu: '500m'
         limits:
           mem: '2Gi'
-          cpu: '1000m'
+          cpu: '1500m'
     agent:
       requests:
         mem: '128Mi'
