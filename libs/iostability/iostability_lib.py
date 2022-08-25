@@ -63,7 +63,7 @@ class IOStabilityLib:
         """
         workloads = [(size, int(total_obj * percent / 100)) for size, percent in
                      distribution.items()]
-        end_time = datetime.now() + timedelta(days=duration_in_days)
+        end_time = datetime.now() + timedelta(minutes=duration_in_days)
         loop = 0
         while datetime.now() < end_time:
             for size, samples in workloads:
