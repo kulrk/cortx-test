@@ -248,10 +248,10 @@ k8s_cortx_deploy:
     confd:
       requests:
         mem: '256Mi'
-        cpu: '250m'
+        cpu: '200m'
       limits:
         mem: '512Mi'
-        cpu: '400m'
+        cpu: '300m'
     rgw:
         requests:
           mem: '1024Mi'
