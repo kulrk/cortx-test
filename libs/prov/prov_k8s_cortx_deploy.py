@@ -48,6 +48,7 @@ from commons.params import TEST_DATA_FOLDER
 from commons.utils import assert_utils
 from commons.utils import ext_lbconfig_utils
 from commons.utils import system_utils
+from commons.utils import yaml_utils
 from config import CMN_CFG
 from config import PROV_CFG
 from config import PROV_TEST_CFG
@@ -802,6 +803,7 @@ class ProvDeployK8sCortxLib:
         Param: control_nodeport_https: https Port for node port service for control
         :returns the status, filepath
         """
+        yaml_utils.add_representer()
         service_type = kwargs.get('service_type', self.deploy_cfg['service_type'])
         nodeport_http = kwargs.get('nodeport_http', self.deploy_cfg['http_port'])
         nodeport_https = kwargs.get('nodeport_https', self.deploy_cfg['https_port'])
@@ -812,6 +814,8 @@ class ProvDeployK8sCortxLib:
         namespace = kwargs.get('namespace', self.deploy_cfg['namespace'])
         client_instance = kwargs.get('client_instance', self.deploy_cfg['client_instance'])
         s3_instance = kwargs.get('s3_instance', self.deploy_cfg['s3_instances_per_node'])
+        extra_configuration = {"thread_pool_size": 10, "max_concurrent_requests": 10}
+        extra_config_str = yaml_utils.AsLiteral(yaml.dump(extra_configuration))
         with open(filepath) as soln:
             conf = yaml.safe_load(soln)
             soln.close()
@@ -842,8 +846,7 @@ class ProvDeployK8sCortxLib:
         noalias_dumper = yaml.dumper.SafeDumper
         noalias_dumper.ignore_aliases = lambda self, data: True
         with open(filepath, 'w') as soln:
-            yaml.dump(conf, soln, default_flow_style=False,
-                      sort_keys=False, Dumper=noalias_dumper)
+            yaml.dump(conf, soln, sort_keys=False)
             soln.close()
         return True, filepath
 
