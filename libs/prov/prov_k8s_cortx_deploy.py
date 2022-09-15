@@ -837,14 +837,15 @@ class ProvDeployK8sCortxLib:
         control_service['nodePorts']['https'] = control_nodeport_https
         common['s3']['max_start_timeout'] = self.deploy_cfg['s3_max_start_timeout']
         common['s3']['instances_per_node'] = s3_instance
+        common['s3']['extra_configuration'] = extra_config_str
         if service_type == "LoadBalancer":
             s3_service['count'] = lb_count
         passwd_dict = {}
         for key, value in self.deploy_cfg['password'].items():
             passwd_dict[key] = pswdmanager.decrypt(value)
         content.update(passwd_dict)
-        noalias_dumper = yaml.dumper.SafeDumper
-        noalias_dumper.ignore_aliases = lambda self, data: True
+        # noalias_dumper = yaml.dumper.SafeDumper
+        # noalias_dumper.ignore_aliases = lambda self, data: True
         with open(filepath, 'w') as soln:
             yaml.dump(conf, soln, sort_keys=False)
             soln.close()
